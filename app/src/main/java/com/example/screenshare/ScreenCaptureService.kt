@@ -171,11 +171,6 @@ class WebServer(port: Int) : NanoHTTPD("0.0.0.0", port) {
                         }
                     }
                     uri.startsWith("/stream.mjpg") -> {
-<<<<<<< HEAD
-                        return object : Response(Response.Status.OK, "multipart/x-mixed-replace; boundary=frame", null, 0) {
-                            override fun send(outputStream: java.io.OutputStream, p1: Long) {
-                                val boundary = "--frame
-=======
                         return newChunkedResponse(
                             Response.Status.OK,
                             "multipart/x-mixed-replace; boundary=frame",
@@ -239,7 +234,6 @@ class WebServer(port: Int) : NanoHTTPD("0.0.0.0", port) {
                         return object : Response(Response.Status.OK, "multipart/x-mixed-replace; boundary=frame", null, 0) {
                             override fun send(outputStream: java.io.OutputStream, p1: Long) {
                                 val boundary = "--frame
->>>>>>> 58321c0 (Initial commit - ScreenShare final)
 "
                                 try {
                                     val out = java.io.BufferedOutputStream(outputStream)
@@ -247,7 +241,6 @@ class WebServer(port: Int) : NanoHTTPD("0.0.0.0", port) {
                                         val frame = latestJpeg
                                         if (frame != null) {
                                             out.write(boundary.toByteArray())
-<<<<<<< HEAD
                                             out.write("Content-Type: image/jpeg
 ".toByteArray())
                                             out.write("Content-Length: ${frame.size}
@@ -255,15 +248,6 @@ class WebServer(port: Int) : NanoHTTPD("0.0.0.0", port) {
 ".toByteArray())
                                             out.write(frame)
                                             out.write("
-=======
-                                            out.write("Content-Type: image/jpeg
-".toByteArray())
-                                            out.write("Content-Length: ${frame.size}
-
-".toByteArray())
-                                            out.write(frame)
-                                            out.write("
->>>>>>> 58321c0 (Initial commit - ScreenShare final)
 ".toByteArray())
                                             out.flush()
                                         }
