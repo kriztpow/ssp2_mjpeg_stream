@@ -171,9 +171,75 @@ class WebServer(port: Int) : NanoHTTPD("0.0.0.0", port) {
                         }
                     }
                     uri.startsWith("/stream.mjpg") -> {
+<<<<<<< HEAD
                         return object : Response(Response.Status.OK, "multipart/x-mixed-replace; boundary=frame", null, 0) {
                             override fun send(outputStream: java.io.OutputStream, p1: Long) {
                                 val boundary = "--frame
+=======
+                        return newChunkedResponse(
+                            Response.Status.OK,
+                            "multipart/x-mixed-replace; boundary=frame",
+                            object : java.io.InputStream() {
+                                override fun read(): Int {
+                                    return -1 // not used
+                                }
+
+                                override fun transferTo(out: java.io.OutputStream): Long {
+                                    val boundary = "--frame
+".toByteArray()
+                                    try {
+                                        while (true) {
+                                            val frame = latestJpeg
+                                            if (frame != null) {
+                                                out.write(boundary)
+                                                out.write("Content-Type: image/jpeg
+".toByteArray())
+                                                out.write("Content-Length: ${frame.size}
+
+".toByteArray())
+                                                out.write(frame)
+                                                out.write("
+".toByteArray())
+                                                out.flush()
+                                            }
+                                            Thread.sleep(50)
+                                        }
+                                    } catch (e: Exception) {
+                                        Log.d(TAG, "Stream client disconnected: ${e.message}")
+                                    }
+                                    return 0
+                                }
+                            }
+                        )
+                    }
+                    else -> {
+                        val ip = getDeviceIpAddress()
+                        val msg = "✅ Screen capture server is running at http://$ip:$listeningPort
+" +
+                                  "Available endpoints:
+" +
+                                  "/ -> this message
+" +
+                                  "/screenshot.jpg -> latest captured frame (jpeg)
+" +
+                                  "/stream.mjpg -> MJPEG live stream
+"
+                        newFixedLengthResponse(msg)
+                    }
+                }
+            } catch (ex: Exception) {
+                Log.e(TAG, "Error in WebServer.serve", ex)
+                return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, "text/plain", "Server error: ${ex.message}")
+            }
+        } else {
+                            newFixedLengthResponse(Response.Status.NO_CONTENT, "text/plain", "No image captured yet.")
+                        }
+                    }
+                    uri.startsWith("/stream.mjpg") -> {
+                        return object : Response(Response.Status.OK, "multipart/x-mixed-replace; boundary=frame", null, 0) {
+                            override fun send(outputStream: java.io.OutputStream, p1: Long) {
+                                val boundary = "--frame
+>>>>>>> 58321c0 (Initial commit - ScreenShare final)
 "
                                 try {
                                     val out = java.io.BufferedOutputStream(outputStream)
@@ -181,6 +247,7 @@ class WebServer(port: Int) : NanoHTTPD("0.0.0.0", port) {
                                         val frame = latestJpeg
                                         if (frame != null) {
                                             out.write(boundary.toByteArray())
+<<<<<<< HEAD
                                             out.write("Content-Type: image/jpeg
 ".toByteArray())
                                             out.write("Content-Length: ${frame.size}
@@ -188,6 +255,15 @@ class WebServer(port: Int) : NanoHTTPD("0.0.0.0", port) {
 ".toByteArray())
                                             out.write(frame)
                                             out.write("
+=======
+                                            out.write("Content-Type: image/jpeg
+".toByteArray())
+                                            out.write("Content-Length: ${frame.size}
+
+".toByteArray())
+                                            out.write(frame)
+                                            out.write("
+>>>>>>> 58321c0 (Initial commit - ScreenShare final)
 ".toByteArray())
                                             out.flush()
                                         }
